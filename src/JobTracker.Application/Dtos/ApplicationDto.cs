@@ -16,6 +16,8 @@ public class ApplicationDto
     public string? Notes { get; set; }
     public string? TechFocus { get; set; }
     public DateTime? JobPublishedDate { get; set; }
+    public int? RecruiterId { get; set; }
+    public string? RecruiterName { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
@@ -34,6 +36,7 @@ public class CreateApplicationDto
     public string? Notes { get; set; }
     public string? TechFocus { get; set; }
     public DateTime? JobPublishedDate { get; set; }
+    public int? RecruiterId { get; set; }
 }
 
 public class UpdateApplicationDto
@@ -50,4 +53,5 @@ public class UpdateApplicationDto
     public string? Notes { get; set; }
     public string? TechFocus { get; set; }
     public DateTime? JobPublishedDate { get; set; }
+    public int? RecruiterId { get; set; }
 }

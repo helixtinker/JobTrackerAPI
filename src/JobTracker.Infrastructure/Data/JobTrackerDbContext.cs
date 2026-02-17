@@ -14,6 +14,8 @@ public class JobTrackerDbContext : DbContext
     public DbSet<ApplicationStatus> ApplicationStatuses => Set<ApplicationStatus>();
     public DbSet<Question> Questions => Set<Question>();
     public DbSet<QuestionType> QuestionTypes => Set<QuestionType>();
+    public DbSet<Recruiter> Recruiters => Set<Recruiter>();
+    public DbSet<RecruiterStatusEntity> RecruiterStatuses => Set<RecruiterStatusEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,6 +48,11 @@ public class JobTrackerDbContext : DbContext
                 .WithMany(s => s.Applications)
                 .HasForeignKey(e => e.StatusId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Recruiter)
+                .WithMany(r => r.Applications)
+                .HasForeignKey(e => e.RecruiterId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<QuestionType>(entity =>
@@ -70,6 +77,35 @@ public class JobTrackerDbContext : DbContext
                 .WithMany(t => t.Questions)
                 .HasForeignKey(e => e.QuestionTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Recruiter>(entity =>
+        {
+            entity.ToTable("Recruiters");
+            entity.HasKey(e => e.RecruiterId);
+            entity.Property(e => e.RecruiterName)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.Company).HasMaxLength(200);
+            entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.LinkedInUrl).HasMaxLength(500);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Status)
+                .WithMany(s => s.Recruiters)
+                .HasForeignKey(e => e.RecruiterStatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RecruiterStatusEntity>(entity =>
+        {
+            entity.ToTable("RecruiterStatus");
+            entity.HasKey(e => e.RecruiterStatusId);
+            entity.Property(e => e.StatusName)
+                .IsRequired()
+                .HasMaxLength(50);
         });
     }
 }

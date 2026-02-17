@@ -41,6 +41,15 @@
 - 2026-02-12: Configured EF Core table mappings for SQL Server schema.
 - 2026-02-12: API fully functional with 27 job applications and 12 interview questions loaded.
 - 2026-02-12: All endpoints tested and working via Swagger UI.
+- 2026-02-16: Added Recruiters table and entity with one-to-many relationship to Applications.
+- 2026-02-16: Prepared project for GitHub with .gitignore and security review.
+
+## Next Steps
+### High Priority Improvements
+- **Input Validation** - Add FluentValidation for all DTOs
+- **Authentication/Authorization** - Implement JWT auth + role-based access control
+- **Global Error Handling** - Add exception middleware for consistent error responses
+- **Unit Tests** - Create xUnit test project with comprehensive test coverage
 
 ## Next Phase
 - Build Angular frontend in separate folder

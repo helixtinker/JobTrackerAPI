@@ -22,6 +22,7 @@ public class ApplicationsController : ControllerBase
     {
         var applications = await _dbContext.Applications
             .Include(a => a.Status)
+            .Include(a => a.Recruiter)
             .ToListAsync();
 
         var dtos = applications.Select(a => new ApplicationDto
@@ -40,6 +41,8 @@ public class ApplicationsController : ControllerBase
             Notes = a.Notes,
             TechFocus = a.TechFocus,
             JobPublishedDate = a.JobPublishedDate,
+            RecruiterId = a.RecruiterId,
+            RecruiterName = a.Recruiter?.RecruiterName,
             CreatedAt = a.CreatedAt,
             UpdatedAt = a.UpdatedAt
         }).ToList();
@@ -52,6 +55,7 @@ public class ApplicationsController : ControllerBase
     {
         var application = await _dbContext.Applications
             .Include(a => a.Status)
+            .Include(a => a.Recruiter)
             .FirstOrDefaultAsync(a => a.ApplicationId == id);
 
         if (application is null)
@@ -73,12 +77,51 @@ public class ApplicationsController : ControllerBase
             Notes = application.Notes,
             TechFocus = application.TechFocus,
             JobPublishedDate = application.JobPublishedDate,
+            RecruiterId = application.RecruiterId,
+            RecruiterName = application.Recruiter?.RecruiterName,
             CreatedAt = application.CreatedAt,
             UpdatedAt = application.UpdatedAt
         };
 
         return Ok(dto);
     }
+
+    [HttpGet("by-StatusId/{statusId}")]
+    public async Task<ActionResult<IEnumerable<ApplicationDto>>> GetByStatusId(int statusId)
+    {
+        var applications = await _dbContext.Applications
+            .Include(a => a.Status)
+            .Include(a => a.Recruiter)
+            .Where(a => a.StatusId == statusId)
+            .OrderByDescending(x => x.AppliedDate)
+            .ToListAsync();
+
+        var dtos = applications.Select(a => new ApplicationDto
+        {
+            ApplicationId = a.ApplicationId,
+            AppliedDate = a.AppliedDate,
+            JobTitle = a.JobTitle,
+            CompanyName = a.CompanyName,
+            Location = a.Location,
+            JobPostUrl = a.JobPostUrl,
+            StatusId = a.StatusId,
+            StatusName = a.Status?.StatusName,
+            CompanyWebsite = a.CompanyWebsite,
+            NetworkContacts = a.NetworkContacts,
+            CompanyResearchKeyPoints = a.CompanyResearchKeyPoints,
+            Notes = a.Notes,
+            TechFocus = a.TechFocus,
+            JobPublishedDate = a.JobPublishedDate,
+            RecruiterId = a.RecruiterId,
+            RecruiterName = a.Recruiter?.RecruiterName,
+            CreatedAt = a.CreatedAt,
+            UpdatedAt = a.UpdatedAt
+        }).ToList();
+
+        return Ok(dtos);
+    }
+
+
 
     [HttpPost]
     public async Task<ActionResult<ApplicationDto>> Create(CreateApplicationDto createDto)
@@ -97,6 +140,7 @@ public class ApplicationsController : ControllerBase
             Notes = createDto.Notes,
             TechFocus = createDto.TechFocus,
             JobPublishedDate = createDto.JobPublishedDate,
+            RecruiterId = createDto.RecruiterId,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -113,11 +157,14 @@ public class ApplicationsController : ControllerBase
             JobPostUrl = application.JobPostUrl,
             StatusId = application.StatusId,
             CompanyWebsite = application.CompanyWebsite,
+            StatusName = application.Status?.StatusName,
             NetworkContacts = application.NetworkContacts,
             CompanyResearchKeyPoints = application.CompanyResearchKeyPoints,
             Notes = application.Notes,
             TechFocus = application.TechFocus,
             JobPublishedDate = application.JobPublishedDate,
+            RecruiterId = application.RecruiterId,
+            RecruiterName = application.Recruiter?.RecruiterName,
             CreatedAt = application.CreatedAt,
             UpdatedAt = application.UpdatedAt
         };
@@ -144,6 +191,7 @@ public class ApplicationsController : ControllerBase
         application.Notes = updateDto.Notes ?? application.Notes;
         application.TechFocus = updateDto.TechFocus ?? application.TechFocus;
         application.JobPublishedDate = updateDto.JobPublishedDate ?? application.JobPublishedDate;
+        application.RecruiterId = updateDto.RecruiterId ?? application.RecruiterId;
         application.UpdatedAt = DateTime.UtcNow;
 
         _dbContext.Applications.Update(application);

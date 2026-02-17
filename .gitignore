@@ -440,6 +440,9 @@ $RECYCLE.BIN/
 .idea/
 *.sln.iml
 
+# VS Code settings
+.vscode/
+
 ##
 ## Custom exclusions for this project
 ##
@@ -451,6 +454,15 @@ scripts/sample-*.sql
 appsettings.Development.json
 appsettings.*.json
 !appsettings.json
+
+# Local launch settings (developer-specific)
+Properties/launchSettings.json
+
+# Test results and coverage
+TestResults/
+*.trx
+*.coverage
+coverage/
 
 # Local database files
 *.db
