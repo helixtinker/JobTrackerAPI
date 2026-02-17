@@ -121,7 +121,83 @@ public class ApplicationsController : ControllerBase
         return Ok(dtos);
     }
 
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<ApplicationDto>>> Search(
+        //[FromQuery] string? jobTitle = null,
+        [FromQuery] string? companyName = null,
+        //[FromQuery] string? location = null,
+        [FromQuery] string? recruiterName = null,
+        [FromQuery] string? techFocus = null,
+        [FromQuery] string? notes = null,
+        [FromQuery] int? statusId = null)
+    {
+        // Validate that at least one parameter is provided
+        if (//string.IsNullOrWhiteSpace(jobTitle) &&
+            string.IsNullOrWhiteSpace(companyName) &&
+            //string.IsNullOrWhiteSpace(location) &&
+            string.IsNullOrWhiteSpace(recruiterName) &&
+            string.IsNullOrWhiteSpace(techFocus) &&
+            string.IsNullOrWhiteSpace(notes) &&
+            !statusId.HasValue)
+        {
+            return BadRequest("At least one search parameter must be provided (jobTitle, companyName, location, recruiterName, techFocus, notes, or statusId).");
+        }
 
+        var query = _dbContext.Applications
+            .Include(a => a.Status)
+            .Include(a => a.Recruiter)
+            .AsQueryable();
+
+        // Apply filters for each provided parameter
+        // if (!string.IsNullOrWhiteSpace(jobTitle))
+        //     query = query.Where(a => a.JobTitle != null && a.JobTitle.Contains(jobTitle));
+
+        if (!string.IsNullOrWhiteSpace(companyName))
+            query = query.Where(a => a.CompanyName != null && a.CompanyName.Contains(companyName));
+
+        // if (!string.IsNullOrWhiteSpace(location))
+        //     query = query.Where(a => a.Location != null && a.Location.Contains(location));
+
+        if (!string.IsNullOrWhiteSpace(recruiterName))
+            query = query.Where(a => a.Recruiter != null && a.Recruiter.RecruiterName != null && a.Recruiter.RecruiterName.Contains(recruiterName));
+
+        if (!string.IsNullOrWhiteSpace(techFocus))
+            query = query.Where(a => a.TechFocus != null && a.TechFocus.Contains(techFocus));
+
+        if (!string.IsNullOrWhiteSpace(notes))
+            query = query.Where(a => a.Notes != null && a.Notes.Contains(notes));
+
+        if (statusId.HasValue)
+            query = query.Where(a => a.StatusId == statusId.Value);
+
+        var applications = await query
+            .OrderByDescending(x => x.AppliedDate)
+            .ToListAsync();
+
+        var dtos = applications.Select(a => new ApplicationDto
+        {
+            ApplicationId = a.ApplicationId,
+            AppliedDate = a.AppliedDate,
+            JobTitle = a.JobTitle,
+            CompanyName = a.CompanyName,
+            Location = a.Location,
+            JobPostUrl = a.JobPostUrl,
+            StatusId = a.StatusId,
+            StatusName = a.Status?.StatusName,
+            CompanyWebsite = a.CompanyWebsite,
+            NetworkContacts = a.NetworkContacts,
+            CompanyResearchKeyPoints = a.CompanyResearchKeyPoints,
+            Notes = a.Notes,
+            TechFocus = a.TechFocus,
+            JobPublishedDate = a.JobPublishedDate,
+            RecruiterId = a.RecruiterId,
+            RecruiterName = a.Recruiter?.RecruiterName,
+            CreatedAt = a.CreatedAt,
+            UpdatedAt = a.UpdatedAt
+        }).ToList();
+
+        return Ok(dtos);
+    }
 
     [HttpPost]
     public async Task<ActionResult<ApplicationDto>> Create(CreateApplicationDto createDto)
