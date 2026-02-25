@@ -26,6 +26,8 @@
 - Applications CRUD ✓
 - Questions CRUD ✓
 - Suggest questions by type ✓
+- JWT authentication ✓
+- CORS for Angular frontend ✓
 
 ## Progress Log
 - 2026-02-11: Defined SQL schema for Applications + ApplicationStatus.
@@ -43,11 +45,11 @@
 - 2026-02-12: All endpoints tested and working via Swagger UI.
 - 2026-02-16: Added Recruiters table and entity with one-to-many relationship to Applications.
 - 2026-02-16: Prepared project for GitHub with .gitignore and security review.
+- 2026-02-25: Added JWT Bearer authentication and CORS configuration for Angular frontend.
 
 ## Next Steps
 ### High Priority Improvements
 - **Input Validation** - Add FluentValidation for all DTOs
-- **Authentication/Authorization** - Implement JWT auth + role-based access control
 - **Global Error Handling** - Add exception middleware for consistent error responses
 - **Unit Tests** - Create xUnit test project with comprehensive test coverage
 

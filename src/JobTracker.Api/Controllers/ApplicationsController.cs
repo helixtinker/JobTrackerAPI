@@ -1,11 +1,13 @@
 using JobTracker.Application.Dtos;
 using DomainModel = JobTracker.Domain;
 using JobTracker.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobTracker.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ApplicationsController : ControllerBase
