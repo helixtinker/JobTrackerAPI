@@ -1,13 +1,62 @@
 # JobTracker API
 
-A multi-layer .NET 9 Web API for tracking job applications and interview questions. Secured with JWT Bearer authentication for use with an Angular frontend.
+A .NET 9 Web API for tracking job applications, interview questions, and recruiter contacts. Built with Clean Architecture to demonstrate layered separation of concerns, the repository pattern, dependency inversion, and JWT authentication.
+
+## Architecture
+
+The solution is split into four projects with a strict one-way dependency flow:
+
+```
+Api  →  Application  ←  Infrastructure
+              ↓
+           Domain
+```
+
+| Project | Responsibility |
+|---|---|
+| `JobTracker.Domain` | Entities and enums. No external dependencies. |
+| `JobTracker.Application` | DTOs, repository interfaces, service interfaces and implementations. Depends only on Domain. |
+| `JobTracker.Infrastructure` | EF Core `DbContext` and repository implementations. Depends on Application and Domain. |
+| `JobTracker.Api` | Controllers, `Program.cs`, DI registration. Depends on Application and Infrastructure. |
+
+**Key design decisions:**
+- Controllers depend on service **interfaces** (`IApplicationService`, etc.), not concrete classes — the composition root (`Program.cs`) is the only place that binds interfaces to implementations.
+- Services depend on repository **interfaces** (`IApplicationRepository`, etc.), not on `DbContext` directly — EF Core is an Infrastructure detail, invisible to business logic.
+- Service implementations live in the **Application layer** alongside their interfaces, because orchestrating business logic is an application concern, not an infrastructure one.
+- The domain entity for a job application is named `JobApplication` (not `Application`) to avoid a namespace collision with the `JobTracker.Application` project — a concrete example of naming decisions that affect the whole codebase.
 
 ## Solution Structure
-- src/JobTracker.Api: API host (controllers, DI, configuration)
-- src/JobTracker.Application: business logic (planned)
-- src/JobTracker.Domain: entities and domain types
-- src/JobTracker.Infrastructure: EF Core, data access
-- scripts/schema.sql: SQL Server schema for manual setup
+
+```
+src/
+├── JobTracker.Api/
+│   ├── Controllers/          ApplicationsController, QuestionsController,
+│   │                         RecruitersController, AuthController
+│   └── Program.cs            DI registration, middleware pipeline
+│
+├── JobTracker.Application/
+│   ├── Dtos/                 JobApplicationDto, QuestionDto, RecruiterDto
+│   │                         (+ Create and Update variants for each)
+│   ├── Repositories/         IApplicationRepository, IQuestionRepository,
+│   │                         IRecruiterRepository
+│   └── Services/             IApplicationService / ApplicationService
+│                             IQuestionService / QuestionService
+│                             IRecruiterService / RecruiterService
+│
+├── JobTracker.Domain/
+│   ├── JobApplication.cs     Core job application entity
+│   ├── ApplicationStatus.cs  Lookup entity
+│   ├── Question.cs
+│   ├── QuestionType.cs
+│   ├── Recruiter.cs
+│   ├── RecruiterStatus.cs    Lookup entity
+│   └── RecruiterStatusCode.cs  Enum (Active, Inactive, DoNotContact)
+│
+└── JobTracker.Infrastructure/
+    ├── Data/                 JobTrackerDbContext (EF Core + Fluent API config)
+    └── Repositories/         ApplicationRepository, QuestionRepository,
+                              RecruiterRepository
+```
 
 ## Setup
 
@@ -18,7 +67,7 @@ A multi-layer .NET 9 Web API for tracking job applications and interview questio
 ### Database Configuration
 1. Create a SQL Server database named `JobTracker`
 2. Run the schema script: [scripts/schema.sql](scripts/schema.sql)
-3. Update your connection string in `src/JobTracker.Api/appsettings.Development.json`:
+3. Add your connection string to `src/JobTracker.Api/appsettings.Development.json`:
    ```json
    {
      "ConnectionStrings": {
@@ -29,7 +78,7 @@ A multi-layer .NET 9 Web API for tracking job applications and interview questio
    Replace `YOUR_SERVER` with your SQL Server instance name.
 
 ### Authentication Configuration
-All API endpoints require a JWT Bearer token. Before running the API, set the following values in `appsettings.Development.json`:
+All API endpoints require a JWT Bearer token. Set the following in `appsettings.Development.json`:
 
 **1. Generate a JWT signing key** (must be at least 32 characters):
 ```powershell
@@ -47,7 +96,7 @@ $bytes = [byte[]]::new(32)
 )
 ```
 
-Add both values to your config:
+Add both to your config:
 ```json
 {
   "Jwt": {
@@ -67,8 +116,8 @@ Add both values to your config:
 
 ### Optional: Sample Data
 Sample data files are available in the `scripts/` folder but are not included in the repository:
-- `sample-applications.sql` - Sample job applications
-- `sample-questions.sql` - Sample interview questions
+- `sample-applications.sql` — Sample job applications
+- `sample-questions.sql` — Sample interview questions
 
 ## Running the API
 
@@ -120,7 +169,7 @@ const res = await fetch('/api/auth/login', {
 const { token } = await res.json();
 localStorage.setItem('token', token);
 
-// Authenticated request (fetch)
+// Authenticated request
 const data = await fetch('/api/applications', {
   headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
 });
@@ -134,64 +183,50 @@ axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 All endpoints require a valid JWT token except `POST /api/auth/login`.
 
 ### Auth
-- `POST /api/auth/login` - Authenticate and receive a JWT token
+- `POST /api/auth/login` — Authenticate and receive a JWT token
 
-### Applications
-- `GET /api/applications` - Get all applications
-- `GET /api/applications/{id}` - Get application by ID
-- `GET /api/applications/by-StatusId/{statusId}` - Filter by status
-- `GET /api/applications/search` - Search (companyName, recruiterName, techFocus, notes, statusId)
-- `POST /api/applications` - Create new application
-- `PUT /api/applications/{id}` - Update application
-- `DELETE /api/applications/{id}` - Delete application
+### Job Applications
+- `GET /api/applications` — Get all applications
+- `GET /api/applications/{id}` — Get application by ID
+- `GET /api/applications/by-StatusId/{statusId}` — Filter by status
+- `GET /api/applications/search` — Search (companyName, recruiterName, techFocus, notes, statusId)
+- `POST /api/applications` — Create new application
+- `PUT /api/applications/{id}` — Update application
+- `DELETE /api/applications/{id}` — Delete application
 
-### Questions
-- `GET /api/questions` - Get all questions
-- `GET /api/questions/{id}` - Get question by ID
-- `GET /api/questions/by-type/{typeId}` - Filter questions by type (1=Behavioral, 2=Technical, 3=Experience)
-- `POST /api/questions` - Create new question
-- `PUT /api/questions/{id}` - Update question
-- `DELETE /api/questions/{id}` - Delete question
+### Interview Questions
+- `GET /api/questions` — Get all questions
+- `GET /api/questions/{id}` — Get question by ID
+- `GET /api/questions/by-type/{typeId}` — Filter by type (1=Behavioral, 2=Technical, 3=Experience)
+- `POST /api/questions` — Create new question
+- `PUT /api/questions/{id}` — Update question
+- `DELETE /api/questions/{id}` — Delete question
 
 ### Recruiters
-- `GET /api/recruiters` - Get all recruiters
-- `GET /api/recruiters/{id}` - Get recruiter by ID
-- `GET /api/recruiters/by-company/{company}` - Filter recruiters by company name
-- `POST /api/recruiters` - Create new recruiter
-- `PUT /api/recruiters/{id}` - Update recruiter
-- `DELETE /api/recruiters/{id}` - Delete recruiter
+- `GET /api/recruiters` — Get all recruiters
+- `GET /api/recruiters/{id}` — Get recruiter by ID
+- `GET /api/recruiters/by-company/{company}` — Filter by company name
+- `POST /api/recruiters` — Create new recruiter
+- `PUT /api/recruiters/{id}` — Update recruiter
+- `DELETE /api/recruiters/{id}` — Delete recruiter
 
-## Status
+## Implementation Status
 
-### Current Implementation ✅
-- ✅ EF Core DbContext configured and tested
-- ✅ Domain entities created (Applications, Questions, Recruiters)
-- ✅ Full CRUD API endpoints implemented
-- ✅ Search endpoint for applications
-- ✅ Swagger UI enabled for testing
-- ✅ SQL Server integration working
-- ✅ Sample data loaded (12 recruiters, 27 applications, 12 questions)
-- ✅ Recruiter-Application one-to-many relationship
-- ✅ GitHub-ready with .gitignore and security review
-- ✅ JWT Bearer authentication
-- ✅ CORS configured for Angular/React frontend (localhost:4200 / localhost:3000)
-
-## Next Steps
-
-### High Priority Improvements
-- **Input Validation** - Add FluentValidation for all DTOs
-- **Global Error Handling** - Add exception middleware for consistent error responses
-- **Unit Tests** - Create xUnit test project with comprehensive test coverage
-
-### Feature Development
-- Create Angular frontend in separate folder
-- Build views for applications management
-- Build views for interview questions
-- Build recruiter management UI
-- Connect frontend to API endpoints
-
-### Additional Enhancements
-- Pagination for GetAll endpoints (currently loads all data)
-- Logging infrastructure (Serilog)
-- Response standardization with wrapper objects
-- Advanced filtering and sorting options
+| Feature | Status |
+|---|---|
+| Clean Architecture layering | ✅ |
+| Repository pattern with interfaces | ✅ |
+| Dependency Inversion at all layers | ✅ |
+| JWT Bearer authentication | ✅ |
+| CORS for Angular/React frontend | ✅ |
+| Swagger UI with Bearer auth support | ✅ |
+| EF Core + SQL Server | ✅ |
+| Full CRUD for all three resources | ✅ |
+| Search endpoint (applications) | ✅ |
+| Input validation (FluentValidation) | 🔲 |
+| Global error handling (ProblemDetails) | 🔲 |
+| Unit and integration tests | 🔲 |
+| Pagination | 🔲 |
+| EF Core migrations | 🔲 |
+| Structured logging (Serilog) | 🔲 |
+| GitHub Actions CI | 🔲 |

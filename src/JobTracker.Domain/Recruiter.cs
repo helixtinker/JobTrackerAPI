@@ -10,10 +10,10 @@ public class Recruiter
     public string? LinkedInUrl { get; set; }
     public DateTime DateContacted { get; set; }
     public int? RecruiterStatusId { get; set; }
-    public RecruiterStatusEntity? Status { get; set; }
+    public RecruiterStatus? Status { get; set; }
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
-    public ICollection<Application> Applications { get; set; } = new List<Application>();
+    public ICollection<JobApplication> Applications { get; set; } = new List<JobApplication>();
 }

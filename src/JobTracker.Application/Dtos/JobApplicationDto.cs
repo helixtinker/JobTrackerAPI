@@ -1,6 +1,6 @@
 namespace JobTracker.Application.Dtos;
 
-public class ApplicationDto
+public class JobApplicationDto
 {
     public int ApplicationId { get; set; }
     public DateTime? AppliedDate { get; set; }
@@ -22,7 +22,7 @@ public class ApplicationDto
     public DateTime? UpdatedAt { get; set; }
 }
 
-public class CreateApplicationDto
+public class CreateJobApplicationDto
 {
     public DateTime? AppliedDate { get; set; }
     public string? JobTitle { get; set; }
@@ -39,7 +39,7 @@ public class CreateApplicationDto
     public int? RecruiterId { get; set; }
 }
 
-public class UpdateApplicationDto
+public class UpdateJobApplicationDto
 {
     public DateTime? AppliedDate { get; set; }
     public string? JobTitle { get; set; }

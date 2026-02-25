@@ -10,12 +10,12 @@ public class JobTrackerDbContext : DbContext
     {
     }
 
-    public DbSet<Application> Applications => Set<Application>();
+    public DbSet<JobApplication> Applications => Set<JobApplication>();
     public DbSet<ApplicationStatus> ApplicationStatuses => Set<ApplicationStatus>();
     public DbSet<Question> Questions => Set<Question>();
     public DbSet<QuestionType> QuestionTypes => Set<QuestionType>();
     public DbSet<Recruiter> Recruiters => Set<Recruiter>();
-    public DbSet<RecruiterStatusEntity> RecruiterStatuses => Set<RecruiterStatusEntity>();
+    public DbSet<RecruiterStatus> RecruiterStatuses => Set<RecruiterStatus>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,7 +30,7 @@ public class JobTrackerDbContext : DbContext
                 .HasMaxLength(50);
         });
 
-        modelBuilder.Entity<Application>(entity =>
+        modelBuilder.Entity<JobApplication>(entity =>
         {
             entity.ToTable("Applications");
             entity.HasKey(e => e.ApplicationId);
@@ -99,7 +99,7 @@ public class JobTrackerDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<RecruiterStatusEntity>(entity =>
+        modelBuilder.Entity<RecruiterStatus>(entity =>
         {
             entity.ToTable("RecruiterStatus");
             entity.HasKey(e => e.RecruiterStatusId);

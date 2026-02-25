@@ -1,5 +1,8 @@
 using System.Text;
+using JobTracker.Application.Repositories;
+using JobTracker.Application.Services;
 using JobTracker.Infrastructure.Data;
+using JobTracker.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -73,6 +76,16 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<JobTrackerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("JobTracker")));
+
+// Repositories
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<IRecruiterRepository, RecruiterRepository>();
+
+// Services
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IRecruiterService, RecruiterService>();
 
 builder.Services.AddControllers();
 

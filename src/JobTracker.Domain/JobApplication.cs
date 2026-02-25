@@ -1,6 +1,6 @@
 namespace JobTracker.Domain;
 
-public class Application
+public class JobApplication
 {
     public int ApplicationId { get; set; }
     public DateTime? AppliedDate { get; set; }

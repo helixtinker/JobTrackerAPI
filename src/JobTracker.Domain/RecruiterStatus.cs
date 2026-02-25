@@ -1,8 +1,9 @@
 namespace JobTracker.Domain;
 
-public enum RecruiterStatus
+public class RecruiterStatus
 {
-    Active = 1,
-    Inactive = 2,
-    DoNotContact = 3
+    public int RecruiterStatusId { get; set; }
+    public string StatusName { get; set; } = string.Empty;
+
+    public ICollection<Recruiter> Recruiters { get; set; } = new List<Recruiter>();
 }
