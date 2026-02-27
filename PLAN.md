@@ -73,11 +73,12 @@ Api  →  Application  ←  Infrastructure
   Repository interfaces in Application; EF Core implementations in Infrastructure.
   Controllers depend only on service interfaces — no DbContext references in Api layer.
 
-- **Unit / Integration Tests** — Create `JobTracker.Tests` xUnit project. Service-layer unit
-  tests with an in-memory DB or Moq; controller integration tests via `WebApplicationFactory`.
+- **Unit / Integration Tests** ✓ — `JobTracker.Tests` xUnit project with 39 service-layer unit
+  tests using Moq (ApplicationService, QuestionService, RecruiterService).
 
-- **Input Validation** — Add FluentValidation for all Create/Update DTOs. Wire up
-  `AddFluentValidationAutoValidation()` so validation errors return 400 automatically.
+- **Input Validation** ✓ — FluentValidation added for all Create/Update DTOs (JobApplication,
+  Question, Recruiter). Auto-validation wired via `AddFluentValidationAutoValidation()`; invalid
+  requests return 400 automatically.
 
 - **Global Error Handling** — Add `IExceptionHandler` (built-in .NET 8+) returning RFC 7807
   `ProblemDetails`. Eliminates try-catch scattered across controllers.
@@ -136,3 +137,9 @@ Api  →  Application  ←  Infrastructure
   Application → JobApplication, RecruiterStatusEntity → RecruiterStatus,
   RecruiterStatus (enum) → RecruiterStatusCode, ApplicationDto → JobApplicationDto.
   All Domain = alias workarounds removed from the codebase.
+- 2026-02-27: Added JobTracker.Tests xUnit project with 39 service-layer unit tests using Moq
+  and FluentAssertions. Covers ApplicationService, QuestionService, and RecruiterService
+  (CRUD, null-guard paths, timestamp assignment, navigation property mapping).
+- 2026-02-27: Added FluentValidation for all Create/Update DTOs (JobApplication, Question,
+  Recruiter). Validators live in Application/Validators/. Auto-validation wired in Program.cs
+  via AddFluentValidationAutoValidation(); invalid requests return 400 automatically.

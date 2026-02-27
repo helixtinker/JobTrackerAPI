@@ -39,9 +39,10 @@ src/
 │   │                         (+ Create and Update variants for each)
 │   ├── Repositories/         IApplicationRepository, IQuestionRepository,
 │   │                         IRecruiterRepository
-│   └── Services/             IApplicationService / ApplicationService
-│                             IQuestionService / QuestionService
-│                             IRecruiterService / RecruiterService
+│   ├── Services/             IApplicationService / ApplicationService
+│   │                         IQuestionService / QuestionService
+│   │                         IRecruiterService / RecruiterService
+│   └── Validators/           FluentValidation validators for all Create/Update DTOs
 │
 ├── JobTracker.Domain/
 │   ├── JobApplication.cs     Core job application entity
@@ -56,6 +57,11 @@ src/
     ├── Data/                 JobTrackerDbContext (EF Core + Fluent API config)
     └── Repositories/         ApplicationRepository, QuestionRepository,
                               RecruiterRepository
+
+tests/
+└── JobTracker.Tests/
+    └── Services/             Unit tests for ApplicationService, QuestionService,
+                              RecruiterService (xUnit + Moq + FluentAssertions)
 ```
 
 ## Setup
@@ -223,9 +229,9 @@ All endpoints require a valid JWT token except `POST /api/auth/login`.
 | EF Core + SQL Server | ✅ |
 | Full CRUD for all three resources | ✅ |
 | Search endpoint (applications) | ✅ |
-| Input validation (FluentValidation) | 🔲 |
+| Input validation (FluentValidation) | ✅ |
 | Global error handling (ProblemDetails) | 🔲 |
-| Unit and integration tests | 🔲 |
+| Unit and integration tests | ✅ |
 | Pagination | 🔲 |
 | EF Core migrations | 🔲 |
 | Structured logging (Serilog) | 🔲 |

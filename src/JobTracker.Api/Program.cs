@@ -1,6 +1,9 @@
 using System.Text;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using JobTracker.Application.Repositories;
 using JobTracker.Application.Services;
+using JobTracker.Application.Validators;
 using JobTracker.Infrastructure.Data;
 using JobTracker.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -88,6 +91,8 @@ builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IRecruiterService, RecruiterService>();
 
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateJobApplicationDtoValidator>();
 
 var app = builder.Build();
 
