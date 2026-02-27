@@ -80,8 +80,9 @@ Api  →  Application  ←  Infrastructure
   Question, Recruiter). Auto-validation wired via `AddFluentValidationAutoValidation()`; invalid
   requests return 400 automatically.
 
-- **Global Error Handling** — Add `IExceptionHandler` (built-in .NET 8+) returning RFC 7807
-  `ProblemDetails`. Eliminates try-catch scattered across controllers.
+- **Global Error Handling** ✓ — `GlobalExceptionHandler` implementing `IExceptionHandler`
+  (built-in .NET 8+) logs all unhandled exceptions and returns RFC 7807 `ProblemDetails`.
+  No try-catch in controllers.
 
 - **Pagination** — Add `PageNumber` / `PageSize` query params to all GetAll endpoints.
   Return a `PaginatedResult<T>` wrapper so callers know total count.
@@ -143,3 +144,5 @@ Api  →  Application  ←  Infrastructure
 - 2026-02-27: Added FluentValidation for all Create/Update DTOs (JobApplication, Question,
   Recruiter). Validators live in Application/Validators/. Auto-validation wired in Program.cs
   via AddFluentValidationAutoValidation(); invalid requests return 400 automatically.
+- 2026-02-27: Added GlobalExceptionHandler (IExceptionHandler) + AddProblemDetails. All
+  unhandled exceptions now return RFC 7807 ProblemDetails 500 and are logged via ILogger.

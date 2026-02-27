@@ -230,7 +230,7 @@ All endpoints require a valid JWT token except `POST /api/auth/login`.
 | Full CRUD for all three resources | ✅ |
 | Search endpoint (applications) | ✅ |
 | Input validation (FluentValidation) | ✅ |
-| Global error handling (ProblemDetails) | 🔲 |
+| Global error handling (ProblemDetails) | ✅ |
 | Unit and integration tests | ✅ |
 | Pagination | 🔲 |
 | EF Core migrations | 🔲 |

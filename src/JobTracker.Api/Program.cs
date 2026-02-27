@@ -1,6 +1,7 @@
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using JobTracker.Api.Exceptions;
 using JobTracker.Application.Repositories;
 using JobTracker.Application.Services;
 using JobTracker.Application.Validators;
@@ -90,6 +91,9 @@ builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IRecruiterService, RecruiterService>();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateJobApplicationDtoValidator>();
@@ -108,6 +112,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors("AngularApp");
 app.UseAuthentication();
