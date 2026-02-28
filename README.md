@@ -2,6 +2,10 @@
 
 A .NET 9 Web API for tracking job applications, interview questions, and recruiter contacts. Built with Clean Architecture to demonstrate layered separation of concerns, the repository pattern, dependency inversion, and JWT authentication.
 
+## A Note on AI-Assisted Development
+
+This project was built with the assistance of AI coding agents, starting with Github CoPilot and then Claude Code. I directed the architecture and feature roadmap, made design decisions, reviewed generated code for correctness and fit, and used the process to deepen my understanding of architecture and coding patterns. I believe knowing how to effectively collaborate with AI tools is an increasingly relevant professional skill in modern software development.
+
 ## Architecture
 
 The solution is split into four projects with a strict one-way dependency flow:
