@@ -17,9 +17,7 @@ public class CreateJobApplicationDtoValidator : AbstractValidator<CreateJobAppli
             .MaximumLength(200);
 
         RuleFor(x => x.JobPostUrl)
-            .MaximumLength(1000)
-            .Must(BeAValidUrl).WithMessage("'{PropertyName}' must be a valid HTTP or HTTPS URL.")
-            .When(x => !string.IsNullOrEmpty(x.JobPostUrl));
+            .MaximumLength(1000);
 
         RuleFor(x => x.CompanyWebsite)
             .MaximumLength(1000)
@@ -60,9 +58,7 @@ public class UpdateJobApplicationDtoValidator : AbstractValidator<UpdateJobAppli
             .When(x => x.Location != null);
 
         RuleFor(x => x.JobPostUrl)
-            .MaximumLength(1000)
-            .Must(BeAValidUrl).WithMessage("'{PropertyName}' must be a valid HTTP or HTTPS URL.")
-            .When(x => !string.IsNullOrEmpty(x.JobPostUrl));
+            .MaximumLength(1000);
 
         RuleFor(x => x.CompanyWebsite)
             .MaximumLength(1000)

@@ -1,0 +1,73 @@
+name: Build, Test, and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  API_PROJECT: 'src/JobTracker.Api/JobTracker.Api.csproj'
+  INFRASTRUCTURE_PROJECT: 'src/JobTracker.Infrastructure/JobTracker.Infrastructure.csproj'
+  TEST_PROJECT: 'tests/JobTracker.Tests/JobTracker.Tests.csproj'
+  PUBLISH_DIR: './publish'
+  AZURE_WEBAPP_NAME: 'job-tracker-api-krks'
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test ${{ env.TEST_PROJECT }} --no-build --configuration Release --verbosity normal
+
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Publish
+        run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --output ${{ env.PUBLISH_DIR }}
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.PUBLISH_DIR }}
+
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Run database migrations
+        run: |
+          dotnet ef database update \
+            --project ${{ env.INFRASTRUCTURE_PROJECT }} \
+            --startup-project ${{ env.API_PROJECT }} \
+            --no-build
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
