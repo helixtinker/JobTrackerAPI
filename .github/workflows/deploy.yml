@@ -61,13 +61,11 @@ jobs:
           package: ${{ env.PUBLISH_DIR }}
 
       - name: Install EF Core tools
-        run: dotnet tool install --global dotnet-ef
+        run: |
+          dotnet tool install --global dotnet-ef
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Run database migrations
-        run: |
-          dotnet ef database update \
-            --project ${{ env.INFRASTRUCTURE_PROJECT }} \
-            --startup-project ${{ env.API_PROJECT }} \
-            --no-build
+        run: dotnet ef database update --project ${{ env.INFRASTRUCTURE_PROJECT }} --startup-project ${{ env.API_PROJECT }}
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
