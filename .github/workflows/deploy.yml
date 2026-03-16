@@ -82,7 +82,7 @@ jobs:
       - name: Run database migrations
         run: dotnet ef database update --project ${{ env.INFRASTRUCTURE_PROJECT }} --startup-project ${{ env.API_PROJECT }}
         env:
-          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
+          ConnectionStrings__JobTracker: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
           ASPNETCORE_ENVIRONMENT: Production
 
       - name: Remove runner IP from Azure SQL firewall
