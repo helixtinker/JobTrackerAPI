@@ -75,9 +75,7 @@ tests/
 - SQL Server or SQL Server Express
 
 ### Database Configuration
-1. Create a SQL Server database named `JobTracker`
-2. Run the schema script: [scripts/schema.sql](scripts/schema.sql)
-3. Add your connection string to `src/JobTracker.Api/appsettings.Development.json`:
+1. Add your connection string to `src/JobTracker.Api/appsettings.Development.json`:
    ```json
    {
      "ConnectionStrings": {
@@ -86,6 +84,10 @@ tests/
    }
    ```
    Replace `YOUR_SERVER` with your SQL Server instance name.
+2. Apply migrations to create the schema:
+   ```bash
+   dotnet ef database update --project src/JobTracker.Infrastructure --startup-project src/JobTracker.Api
+   ```
 
 ### Authentication Configuration
 All API endpoints require a JWT Bearer token. Set the following in `appsettings.Development.json`:
@@ -237,6 +239,6 @@ All endpoints require a valid JWT token except `POST /api/auth/login`.
 | Global error handling (ProblemDetails) | ✅ |
 | Unit and integration tests | ✅ |
 | Pagination | 🔲 |
-| EF Core migrations | 🔲 |
+| EF Core migrations | ✅ |
 | Structured logging (Serilog) | 🔲 |
-| GitHub Actions CI | 🔲 |
+| GitHub Actions CI/CD | ✅ |
