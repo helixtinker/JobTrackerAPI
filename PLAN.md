@@ -89,14 +89,14 @@ Api  →  Application  ←  Infrastructure
 
 ### Tier 2 — Strong Differentiators
 
-- **EF Core Migrations** — Replace `scripts/schema.sql` with EF migrations so the schema
-  is always in sync with the model and the project is runnable from a clean clone.
+- **EF Core Migrations** ✓ — Schema managed via EF Core migrations in Infrastructure project.
+  `dotnet ef database update` creates/updates the database from a clean clone.
 
 - **Structured Logging (Serilog)** — Add Serilog writing to console + rolling file with
   structured properties. Demonstrates observability awareness.
 
-- **GitHub Actions CI** — Add `.github/workflows/build.yml` that builds and runs tests on
-  push/PR. Signals professional workflow to anyone browsing the repo.
+- **GitHub Actions CI/CD** ✓ — `.github/workflows/deploy.yml` builds and runs tests on all
+  PRs; deploys to Azure App Service and runs migrations on merge to main.
 
 - **Fix Password Hashing** — Replace SHA-256 (fast general-purpose hash, wrong for
   passwords) with BCrypt.Net or `PasswordHasher<T>` from ASP.NET Core Identity.
@@ -146,3 +146,8 @@ Api  →  Application  ←  Infrastructure
   via AddFluentValidationAutoValidation(); invalid requests return 400 automatically.
 - 2026-02-27: Added GlobalExceptionHandler (IExceptionHandler) + AddProblemDetails. All
   unhandled exceptions now return RFC 7807 ProblemDetails 500 and are logged via ILogger.
+- 2026-03-16: Added EF Core migrations (InitialCreate). Schema now managed via migrations
+  instead of scripts/schema.sql.
+- 2026-03-16: Deployed to Azure App Service (job-tracker-api-krks.azurewebsites.net) with
+  Azure SQL Database. GitHub Actions CI/CD pipeline builds, tests, runs migrations, and
+  deploys on merge to main. Branch protection enforces PR + passing checks before merge.
