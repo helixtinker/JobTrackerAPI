@@ -1,6 +1,6 @@
 # JobTracker API
 
-A .NET 9 Web API for tracking job applications, interview questions, and recruiter contacts. Built with Clean Architecture to demonstrate layered separation of concerns, the repository pattern, dependency inversion, and JWT authentication.
+A .NET 9 Web API for tracking job applications, interview questions, and recruiter contacts. Built with Clean Architecture to demonstrate layered separation of concerns, the repository pattern, dependency inversion, and JWT authentication. Includes interview prep question retrieval matched to the technologies listed on a job application.
 
 ## A Note on AI-Assisted Development
 
