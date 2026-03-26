@@ -164,6 +164,9 @@ namespace JobTracker.Infrastructure.Migrations
 
                     b.HasIndex("QuestionId");
 
+                    b.HasIndex("Tag", "QuestionId")
+                        .HasDatabaseName("IX_QuestionTechTags_Tag_QuestionId");
+
                     b.ToTable("QuestionTechTags", (string)null);
                 });
 
