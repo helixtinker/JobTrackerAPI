@@ -18,6 +18,7 @@ public class QuestionRepository : IQuestionRepository
     {
         return await _dbContext.Questions
             .Include(q => q.QuestionType)
+            .Include(q => q.TechTags)
             .ToListAsync();
     }
 
@@ -25,6 +26,7 @@ public class QuestionRepository : IQuestionRepository
     {
         return await _dbContext.Questions
             .Include(q => q.QuestionType)
+            .Include(q => q.TechTags)
             .FirstOrDefaultAsync(q => q.QuestionId == id);
     }
 
@@ -32,7 +34,26 @@ public class QuestionRepository : IQuestionRepository
     {
         return await _dbContext.Questions
             .Include(q => q.QuestionType)
+            .Include(q => q.TechTags)
             .Where(q => q.QuestionTypeId == typeId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Question>> GetByTechTagsAsync(IEnumerable<string> tags)
+    {
+        var normalised = tags
+            .Where(t => !string.IsNullOrWhiteSpace(t))
+            .Select(t => t.Trim().ToLower())
+            .Distinct()
+            .ToList();
+
+        if (normalised.Count == 0)
+            return [];
+
+        return await _dbContext.Questions
+            .Include(q => q.QuestionType)
+            .Include(q => q.TechTags)
+            .Where(q => q.TechTags.Any(t => normalised.Contains(t.Tag)))
             .ToListAsync();
     }
 

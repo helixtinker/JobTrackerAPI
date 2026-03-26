@@ -7,10 +7,12 @@ namespace JobTracker.Application.Services;
 public class QuestionService : IQuestionService
 {
     private readonly IQuestionRepository _repository;
+    private readonly IApplicationRepository _applicationRepository;
 
-    public QuestionService(IQuestionRepository repository)
+    public QuestionService(IQuestionRepository repository, IApplicationRepository applicationRepository)
     {
         _repository = repository;
+        _applicationRepository = applicationRepository;
     }
 
     public async Task<IEnumerable<QuestionDto>> GetAllAsync()
@@ -31,6 +33,28 @@ public class QuestionService : IQuestionService
         return questions.Select(ToDto);
     }
 
+    public async Task<IEnumerable<QuestionDto>> GetByTechTagsAsync(IEnumerable<string> tags)
+    {
+        var questions = await _repository.GetByTechTagsAsync(tags);
+        return questions.Select(ToDto);
+    }
+
+    public async Task<IEnumerable<QuestionDto>?> GetByApplicationTechFocusAsync(int applicationId)
+    {
+        var application = await _applicationRepository.GetByIdAsync(applicationId);
+        if (application is null)
+            return null;
+
+        if (string.IsNullOrWhiteSpace(application.TechFocus))
+            return [];
+
+        var tags = application.TechFocus
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        var questions = await _repository.GetByTechTagsAsync(tags);
+        return questions.Select(ToDto);
+    }
+
     public async Task<QuestionDto> CreateAsync(CreateQuestionDto dto)
     {
         var question = new Question
@@ -38,13 +62,16 @@ public class QuestionService : IQuestionService
             QuestionText = dto.QuestionText,
             AnswerText = dto.AnswerText,
             QuestionTypeId = dto.QuestionTypeId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            TechTags = dto.TechTags?
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Select(t => new QuestionTechTag { Tag = t.Trim() })
+                .ToList() ?? []
         };
 
         await _repository.AddAsync(question);
         await _repository.SaveChangesAsync();
 
-        // Reload with navigation properties for the response DTO
         var created = await _repository.GetByIdAsync(question.QuestionId);
         return ToDto(created!);
     }
@@ -59,6 +86,13 @@ public class QuestionService : IQuestionService
         question.AnswerText = dto.AnswerText ?? question.AnswerText;
         question.QuestionTypeId = dto.QuestionTypeId;
         question.UpdatedAt = DateTime.UtcNow;
+
+        if (dto.TechTags is not null)
+        {
+            question.TechTags.Clear();
+            foreach (var tag in dto.TechTags.Where(t => !string.IsNullOrWhiteSpace(t)))
+                question.TechTags.Add(new QuestionTechTag { Tag = tag.Trim() });
+        }
 
         await _repository.SaveChangesAsync();
         return true;
@@ -82,6 +116,7 @@ public class QuestionService : IQuestionService
         AnswerText = q.AnswerText,
         QuestionTypeId = q.QuestionTypeId,
         QuestionTypeName = q.QuestionType?.TypeName,
+        TechTags = q.TechTags.Select(t => t.Tag).ToArray(),
         CreatedAt = q.CreatedAt,
         UpdatedAt = q.UpdatedAt
     };

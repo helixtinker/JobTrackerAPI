@@ -1,6 +1,6 @@
 # JobTracker API
 
-A .NET 9 Web API for tracking job applications, interview questions, and recruiter contacts. Built with Clean Architecture to demonstrate layered separation of concerns, the repository pattern, dependency inversion, and JWT authentication.
+A .NET 9 Web API for tracking job applications, interview questions, and recruiter contacts. Built with Clean Architecture to demonstrate layered separation of concerns, the repository pattern, dependency inversion, and JWT authentication. Includes interview prep question retrieval matched to the technologies listed on a job application.
 
 ## A Note on AI-Assisted Development
 
@@ -52,6 +52,7 @@ src/
 │   ├── JobApplication.cs     Core job application entity
 │   ├── ApplicationStatus.cs  Lookup entity
 │   ├── Question.cs
+│   ├── QuestionTechTag.cs    Child entity — tags a question with a technology name
 │   ├── QuestionType.cs
 │   ├── Recruiter.cs
 │   ├── RecruiterStatus.cs    Lookup entity
@@ -210,8 +211,10 @@ All endpoints require a valid JWT token except `POST /api/auth/login`.
 - `GET /api/questions` — Get all questions
 - `GET /api/questions/{id}` — Get question by ID
 - `GET /api/questions/by-type/{typeId}` — Filter by type (1=Behavioral, 2=Technical, 3=Experience)
-- `POST /api/questions` — Create new question
-- `PUT /api/questions/{id}` — Update question
+- `GET /api/questions/by-tech?tag=React` — Filter by technology tag
+- `GET /api/applications/{id}/questions` — Get interview prep questions matched to an application's TechFocus
+- `POST /api/questions` — Create new question (accepts `techTags` array)
+- `PUT /api/questions/{id}` — Update question (replaces `techTags` if provided)
 - `DELETE /api/questions/{id}` — Delete question
 
 ### Recruiters
@@ -238,6 +241,8 @@ All endpoints require a valid JWT token except `POST /api/auth/login`.
 | Input validation (FluentValidation) | ✅ |
 | Global error handling (ProblemDetails) | ✅ |
 | Unit and integration tests | ✅ |
+| Tech tag filtering for interview questions | ✅ |
+| Interview prep questions by application | ✅ |
 | Pagination | 🔲 |
 | EF Core migrations | ✅ |
 | Structured logging (Serilog) | 🔲 |

@@ -11,10 +11,12 @@ namespace JobTracker.Api.Controllers;
 public class ApplicationsController : ControllerBase
 {
     private readonly IApplicationService _applicationService;
+    private readonly IQuestionService _questionService;
 
-    public ApplicationsController(IApplicationService applicationService)
+    public ApplicationsController(IApplicationService applicationService, IQuestionService questionService)
     {
         _applicationService = applicationService;
+        _questionService = questionService;
     }
 
     [HttpGet]
@@ -77,6 +79,16 @@ public class ApplicationsController : ControllerBase
             return NotFound();
 
         return NoContent();
+    }
+
+    [HttpGet("{id}/questions")]
+    public async Task<ActionResult<IEnumerable<QuestionDto>>> GetQuestions(int id)
+    {
+        var questions = await _questionService.GetByApplicationTechFocusAsync(id);
+        if (questions is null)
+            return NotFound();
+
+        return Ok(questions);
     }
 
     [HttpDelete("{id}")]

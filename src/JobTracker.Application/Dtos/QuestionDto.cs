@@ -7,6 +7,7 @@ public class QuestionDto
     public string? AnswerText { get; set; }
     public int QuestionTypeId { get; set; }
     public string? QuestionTypeName { get; set; }
+    public IEnumerable<string> TechTags { get; set; } = [];
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
@@ -16,6 +17,7 @@ public class CreateQuestionDto
     public string QuestionText { get; set; } = string.Empty;
     public string? AnswerText { get; set; }
     public int QuestionTypeId { get; set; }
+    public IEnumerable<string>? TechTags { get; set; }
 }
 
 public class UpdateQuestionDto
@@ -23,4 +25,5 @@ public class UpdateQuestionDto
     public string QuestionText { get; set; } = string.Empty;
     public string? AnswerText { get; set; }
     public int QuestionTypeId { get; set; }
+    public IEnumerable<string>? TechTags { get; set; }
 }
