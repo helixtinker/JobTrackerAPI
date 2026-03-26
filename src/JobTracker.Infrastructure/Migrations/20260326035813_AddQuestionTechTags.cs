@@ -34,11 +34,20 @@ namespace JobTracker.Infrastructure.Migrations
                 name: "IX_QuestionTechTags_QuestionId",
                 table: "QuestionTechTags",
                 column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionTechTags_Tag_QuestionId",
+                table: "QuestionTechTags",
+                columns: new[] { "Tag", "QuestionId" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropIndex(
+                name: "IX_QuestionTechTags_Tag_QuestionId",
+                table: "QuestionTechTags");
+
             migrationBuilder.DropTable(
                 name: "QuestionTechTags");
         }

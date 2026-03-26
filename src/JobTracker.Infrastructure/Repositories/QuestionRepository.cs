@@ -41,11 +41,19 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<IEnumerable<Question>> GetByTechTagsAsync(IEnumerable<string> tags)
     {
-        var normalised = tags.Select(t => t.Trim().ToLower()).ToList();
+        var normalised = tags
+            .Where(t => !string.IsNullOrWhiteSpace(t))
+            .Select(t => t.Trim().ToLower())
+            .Distinct()
+            .ToList();
+
+        if (normalised.Count == 0)
+            return [];
+
         return await _dbContext.Questions
             .Include(q => q.QuestionType)
             .Include(q => q.TechTags)
-            .Where(q => q.TechTags.Any(t => normalised.Contains(t.Tag.ToLower())))
+            .Where(q => q.TechTags.Any(t => normalised.Contains(t.Tag)))
             .ToListAsync();
     }
 

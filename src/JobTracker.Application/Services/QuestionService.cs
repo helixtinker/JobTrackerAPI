@@ -116,7 +116,7 @@ public class QuestionService : IQuestionService
         AnswerText = q.AnswerText,
         QuestionTypeId = q.QuestionTypeId,
         QuestionTypeName = q.QuestionType?.TypeName,
-        TechTags = q.TechTags.Select(t => t.Tag),
+        TechTags = q.TechTags.Select(t => t.Tag).ToArray(),
         CreatedAt = q.CreatedAt,
         UpdatedAt = q.UpdatedAt
     };

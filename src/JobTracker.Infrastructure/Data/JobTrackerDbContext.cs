@@ -92,6 +92,9 @@ public class JobTrackerDbContext : DbContext
                 .WithMany(q => q.TechTags)
                 .HasForeignKey(e => e.QuestionId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.Tag, e.QuestionId })
+                .HasDatabaseName("IX_QuestionTechTags_Tag_QuestionId");
         });
 
         modelBuilder.Entity<Recruiter>(entity =>
