@@ -41,6 +41,16 @@ public class QuestionsController : ControllerBase
         return Ok(questions);
     }
 
+    [HttpGet("by-tech")]
+    public async Task<ActionResult<IEnumerable<QuestionDto>>> GetByTech([FromQuery] string tag)
+    {
+        if (string.IsNullOrWhiteSpace(tag))
+            return BadRequest("A tag must be provided.");
+
+        var questions = await _questionService.GetByTechTagsAsync([tag]);
+        return Ok(questions);
+    }
+
     [HttpPost]
     public async Task<ActionResult<QuestionDto>> Create(CreateQuestionDto createDto)
     {

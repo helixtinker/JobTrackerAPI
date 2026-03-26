@@ -13,6 +13,7 @@
   - Applications
   - QuestionType (lookup)
   - Questions
+  - QuestionTechTags (child of Questions — one-to-many, cascade delete)
   - RecruiterStatus (lookup)
   - Recruiters
 
@@ -32,6 +33,7 @@ src/
     JobApplication.cs    — Core job application entity
     ApplicationStatus.cs — Lookup entity
     Question.cs
+    QuestionTechTag.cs   — Child entity; tags a question with a technology name
     QuestionType.cs
     Recruiter.cs
     RecruiterStatus.cs   — Lookup entity (was RecruiterStatusEntity)
@@ -59,6 +61,8 @@ Api  →  Application  ←  Infrastructure
 - Recruiters CRUD ✓
 - Filter by status / type / company ✓
 - Search endpoint (applications) ✓
+- Questions by tech tag ✓
+- Questions by application TechFocus ✓
 - JWT authentication ✓
 - CORS for Angular frontend ✓
 - Swagger UI with Bearer auth ✓
@@ -73,7 +77,7 @@ Api  →  Application  ←  Infrastructure
   Repository interfaces in Application; EF Core implementations in Infrastructure.
   Controllers depend only on service interfaces — no DbContext references in Api layer.
 
-- **Unit / Integration Tests** ✓ — `JobTracker.Tests` xUnit project with 39 service-layer unit
+- **Unit / Integration Tests** ✓ — `JobTracker.Tests` xUnit project with 47 service-layer unit
   tests using Moq (ApplicationService, QuestionService, RecruiterService).
 
 - **Input Validation** ✓ — FluentValidation added for all Create/Update DTOs (JobApplication,
@@ -151,3 +155,10 @@ Api  →  Application  ←  Infrastructure
 - 2026-03-16: Deployed to Azure App Service (job-tracker-api-krks.azurewebsites.net) with
   Azure SQL Database. GitHub Actions CI/CD pipeline builds, tests, runs migrations, and
   deploys on merge to main. Branch protection enforces PR + passing checks before merge.
+- 2026-03-26: Added QuestionTechTag entity and QuestionTechTags table (one-to-many child of
+  Questions, cascade delete). Questions can now carry multiple technology tags. Added
+  GET /api/questions/by-tech?tag= to filter questions by a single tag, and
+  GET /api/applications/{id}/questions to return interview prep questions matched to an
+  application's TechFocus field (parsed and matched case-insensitively). QuestionService
+  now takes IApplicationRepository to support the TechFocus lookup. 8 new unit tests added
+  (47 total). EF Core migration AddQuestionTechTags applied.

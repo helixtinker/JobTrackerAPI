@@ -14,6 +14,7 @@ public class JobTrackerDbContext : DbContext
     public DbSet<ApplicationStatus> ApplicationStatuses => Set<ApplicationStatus>();
     public DbSet<Question> Questions => Set<Question>();
     public DbSet<QuestionType> QuestionTypes => Set<QuestionType>();
+    public DbSet<QuestionTechTag> QuestionTechTags => Set<QuestionTechTag>();
     public DbSet<Recruiter> Recruiters => Set<Recruiter>();
     public DbSet<RecruiterStatus> RecruiterStatuses => Set<RecruiterStatus>();
 
@@ -77,6 +78,20 @@ public class JobTrackerDbContext : DbContext
                 .WithMany(t => t.Questions)
                 .HasForeignKey(e => e.QuestionTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<QuestionTechTag>(entity =>
+        {
+            entity.ToTable("QuestionTechTags");
+            entity.HasKey(e => e.QuestionTechTagId);
+            entity.Property(e => e.Tag)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.HasOne(e => e.Question)
+                .WithMany(q => q.TechTags)
+                .HasForeignKey(e => e.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Recruiter>(entity =>

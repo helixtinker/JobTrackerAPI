@@ -12,6 +12,10 @@ public class CreateQuestionDtoValidator : AbstractValidator<CreateQuestionDto>
 
         RuleFor(x => x.QuestionTypeId)
             .GreaterThan(0).WithMessage("A valid question type is required.");
+
+        RuleForEach(x => x.TechTags)
+            .MaximumLength(100).WithMessage("Each tech tag must not exceed 100 characters.")
+            .When(x => x.TechTags != null);
     }
 }
 
@@ -24,5 +28,9 @@ public class UpdateQuestionDtoValidator : AbstractValidator<UpdateQuestionDto>
 
         RuleFor(x => x.QuestionTypeId)
             .GreaterThan(0).WithMessage("A valid question type is required.");
+
+        RuleForEach(x => x.TechTags)
+            .MaximumLength(100).WithMessage("Each tech tag must not exceed 100 characters.")
+            .When(x => x.TechTags != null);
     }
 }
